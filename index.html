@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Enhanced Storyboard Design</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    /* CSS Variables */
+    :root {
+      --color-primary: #ff6f61;
+      --color-secondary: #4a90e2;
+      --color-bg-light: #f0f2f5;
+      --color-bg-dark: #121212;
+      --color-text-light: #222;
+      --color-text-dark: #ddd;
+      --color-shadow-primary: rgba(255, 111, 97, 0.3);
+      --color-shadow-secondary: rgba(74, 144, 226, 0.3);
+      --font-primary: 'Playfair Display', serif;
+      --font-secondary: 'Inter', sans-serif;
+      --transition-fast: 0.25s ease-in-out;
+      --border-radius: 18px;
+      --focus-outline: 3px solid var(--color-primary);
+    }
+
+    /* Reset & base */
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0; padding: 0;
+      font-family: var(--font-secondary);
+      background: linear-gradient(135deg, #f0f2f5, #dbe1e7);
+      min-height: 100vh;
+      color: var(--color-text-light);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Dark mode */
+    body.dark-mode {
+      background: linear-gradient(135deg, #121212, #1f1f1f);
+      color: var(--color-text-dark);
+    }
+
+    /* Container */
+    .container {
+      max-width: 960px;
+      background: #fff;
+      border-radius: var(--border-radius);
+      box-shadow: 0 25px 40px rgba(0, 0, 0, 0.1);
+      padding: 40px 40px 60px;
+      position: relative;
+      overflow: hidden;
+      transition: background 0.5s ease;
+    }
+    body.dark-mode .container {
+      background: #222;
+      box-shadow: 0 25px 40px rgba(0, 0, 0, 0.6);
+    }
+
+    /* Gradient overlay for depth */
+    .container::before {
+      content: '';
+      position: absolute;
+      top: -40%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle at center, var(--color-primary), transparent 70%);
+      opacity: 0.08;
+      pointer-events: none;
+      z-index: 0;
+      transition: opacity 0.5s ease;
+    }
+    body.dark-mode .container::before {
+      opacity: 0.12;
+      background: radial-gradient(circle at center, var(--color-secondary), transparent 70%);
+    }
+
+    /* Header */
+    h1 {
+      font-family: var(--font-primary);
+      font-weight: 700;
+      font-size: 3rem;
+      text-align: center;
+      margin-bottom: 10px;
+      letter-spacing: 1.2px;
+      color: var(--color-primary);
+      text-shadow: 0 2px 8px rgba(255,111,97,0.4);
+      user-select: none;
+    }
+    body.dark-mode h1 {
+      color: var(--color-secondary);
+      text-shadow: 0 2px 10px rgba(74,144,226,0.5);
+    }
+
+    /* Description */
+    .description {
+      font-size: 1.15rem;
+      text-align: center;
+      max-width: 600px;
+      margin: 0 auto 45px;
+      font-weight: 600;
+      color: #555;
+      line-height: 1.5;
+      user-select: none;
+      transition: color 0.5s ease;
+    }
+    body.dark-mode .description {
+      color: #bbb;
+    }
+
+    /* Scenes container */
+    .scenes {
+      display: flex;
+      gap: 30px;
+      justify-content: center;
+      flex-wrap: wrap;
+      z-index: 10;
+      position: relative;
+    }
+
+    /* Scene cards */
+    .scene-card {
+      flex: 1 1 280px;
+      background: #fafafa;
+      border-radius: var(--border-radius);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.12);
+      overflow: hidden;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      transition: box-shadow 0.3s ease, transform 0.35s ease;
+      position: relative;
+      outline-offset: 3px;
+      user-select: none;
+    }
+    body.dark-mode .scene-card {
+      background: #333;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+    }
+    .scene-card:hover,
+    .scene-card:focus-visible {
+      box-shadow: 0 25px 45px rgba(255,111,97,0.35);
+      transform: translateY(-12px) scale(1.04);
+      outline: var(--focus-outline);
+      outline-offset: 6px;
+    }
+    body.dark-mode .scene-card:hover,
+    body.dark-mode .scene-card:focus-visible {
+      box-shadow: 0 25px 45px rgba(74,144,226,0.4);
+    }
+
+    /* Scene image */
+    .scene-image {
+      flex: 1 1 160px;
+      background-size: cover;
+      background-position: center center;
+      border-top-left-radius: var(--border-radius);
+      border-top-right-radius: var(--border-radius);
+      height: 180px;
+      transition: transform 0.5s ease;
+      will-change: transform;
+    }
+    .scene-card:hover .scene-image {
+      transform: scale(1.1);
+      filter: brightness(0.95);
+    }
+    body.dark-mode .scene-image {
+      filter: brightness(0.8);
+    }
+
+    /* Scene content */
+    .scene-content {
+      padding: 18px 20px 22px;
+      flex-shrink: 0;
+      background: transparent;
+    }
+    .scene-title {
+      font-family: var(--font-primary);
+      font-weight: 700;
+      font-size: 1.4rem;
+      color: var(--color-primary);
+      margin: 0 0 8px;
+      text-shadow: 0 1px 4px rgba(255,111,97,0.25);
+      user-select: text;
+      transition: color 0.4s ease;
+    }
+    body.dark-mode .scene-title {
+      color: var(--color-secondary);
+      text-shadow: 0 1px 6px rgba(74,144,226,0.4);
+    }
+    .scene-desc {
+      font-family: var(--font-secondary);
+      font-weight: 600;
+      font-size: 1rem;
+      color: #555;
+      line-height: 1.5;
+      user-select: text;
+      min-height: 60px;
+      transition: color 0.4s ease;
+    }
+    body.dark-mode .scene-desc {
+      color: #ccc;
+    }
+
+    /* Timeline */
+    .timeline {
+      margin-top: 48px;
+      position: relative;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      user-select: none;
+      z-index: 20;
+    }
+    .timeline-progress {
+      position: absolute;
+      top: 50%;
+      left: 8%;
+      right: 8%;
+      height: 6px;
+      background: #ddd;
+      border-radius: 8px;
+      transform: translateY(-50%);
+      overflow: hidden;
+      z-index: 0;
+      transition: background 0.4s ease;
+    }
+    body.dark-mode .timeline-progress {
+      background: #444;
+    }
+    .timeline-progress > div {
+      height: 100%;
+      width: 0;
+      background: var(--color-primary);
+      border-radius: 8px;
+      transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    body.dark-mode .timeline-progress > div {
+      background: var(--color-secondary);
+    }
+    .timeline-point {
+      position: relative;
+      width: 22px;
+      height: 22px;
+      background: #fff;
+      border: 3px solid var(--color-primary);
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 0 10px var(--color-shadow-primary);
+      transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+      z-index: 10;
+      user-select: none;
+    }
+    body.dark-mode .timeline-point {
+      background: #222;
+      border-color: var(--color-secondary);
+      box-shadow: 0 0 10px var(--color-shadow-secondary);
+    }
+    .timeline-point:hover,
+    .timeline-point:focus-visible {
+      background: var(--color-primary);
+      border-color: var(--color-primary);
+      box-shadow: 0 0 20px var(--color-shadow-primary);
+      outline: none;
+    }
+    body.dark-mode .timeline-point:hover,
+    body.dark-mode .timeline-point:focus-visible {
+      background: var(--color-secondary);
+      border-color: var(--color-secondary);
+      box-shadow: 0 0 20px var(--color-shadow-secondary);
+    }
+    .timeline-point.active {
+      background: var(--color-primary);
+      border-color: var(--color-primary);
+      box-shadow: 0 0 25px var(--color-shadow-primary);
+    }
+    body.dark-mode .timeline-point.active {
+      background: var(--color-secondary);
+      border-color: var(--color-secondary);
+      box-shadow: 0 0 25px var(--color-shadow-secondary);
+    }
+
+    /* Tooltip */
+    .timeline-point::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 130%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--color-primary);
+      color: white;
+      padding: 6px 12px;
+      font-size: 0.85rem;
+      border-radius: 12px;
+      opacity: 0;
+      pointer-events: none;
+      white-space: nowrap;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      user-select: none;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      z-index: 100;
+    }
+    body.dark-mode .timeline-point::after {
+      background: var(--color-secondary);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    }
+    .timeline-point:hover::after,
+    .timeline-point:focus-visible::after,
+    .timeline-point.active::after {
+      opacity: 1;
+      transform: translateX(-50%) translateY(-6px);
+      pointer-events: auto;
+    }
+
+    /* Video Modal */
+    .video-modal {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.75);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s ease;
+      z-index: 50;
+      user-select: none;
+    }
+    .video-modal.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .video-content {
+      position: relative;
+      max-width: 90vw;
+      max-height: 80vh;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.9);
+      background: #000;
+    }
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+    .btn-close {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: var(--color-primary);
+      border: none;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      cursor: pointer;
+      color: white;
+      font-size: 20px;
+      font-weight: bold;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 3px 8px rgba(255,111,97,0.7);
+      transition: background 0.3s ease;
+      user-select: none;
+    }
+    .btn-close:hover,
+    .btn-close:focus-visible {
+      background: #e04e3d;
+      outline: none;
+    }
+    body.dark-mode .btn-close {
+      background: var(--color-secondary);
+      box-shadow: 0 3px 10px rgba(74,144,226,0.7);
+    }
+    body.dark-mode .btn-close:hover,
+    body.dark-mode .btn-close:focus-visible {
+      background: #3a78d0;
+    }
+
+    /* Cursor */
+    .cursor {
+      width: 24px;
+      height: 24px;
+      border: 3px solid var(--color-primary);
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      transition: transform 0.15s ease, border-color 0.25s ease;
+      transform: translate(-50%, -50%) scale(1);
+      z-index: 9999;
+      mix-blend-mode: difference;
+      will-change: transform, border-color;
+    }
+    body.dark-mode .cursor {
+      border-color: var(--color-secondary);
+    }
+    .cursor.active {
+      transform: translate(-50%, -50%) scale(1.5);
+      border-color: var(--color-primary);
+    }
+    body.dark-mode .cursor.active {
+      border-color: var(--color-secondary);
+    }
+
+    /* Dark mode toggle button */
+    .toggle-darkmode {
+      position: fixed;
+      top: 25px;
+      right: 25px;
+      background: var(--color-primary);
+      border: none;
+      padding: 12px 18px;
+      border-radius: 30px;
+      color: white;
+      font-weight: 700;
+      font-family: var(--font-secondary);
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(255,111,97,0.4);
+      transition: background 0.3s ease;
+      user-select: none;
+      z-index: 1000;
+    }
+    .toggle-darkmode:hover,
+    .toggle-darkmode:focus-visible {
+      background: #e04e3d;
+      outline: none;
+    }
+    body.dark-mode .toggle-darkmode {
+      background: var(--color-secondary);
+      box-shadow: 0 4px 15px rgba(74,144,226,0.5);
+    }
+    body.dark-mode .toggle-darkmode:hover,
+    body.dark-mode .toggle-darkmode:focus-visible {
+      background: #3a78d0;
+    }
+
+    /* Responsive */
+    @media (max-width: 720px) {
+      .scenes {
+        flex-direction: column;
+        gap: 28px;
+      }
+      .scene-card {
+        max-width: 100%;
+        margin: 0 auto;
+      }
+      .timeline {
+        max-width: 320px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <button class="toggle-darkmode" aria-label="Toggle dark mode">Dark Mode</button>
+
+  <div class="container" role="main" aria-label="Storyboard design interactive section">
+
+    <h1>Storyboard Design</h1>
+    <p class="description">Create impactful visual narratives, capturing scenes and emotions effectively through dynamic visuals.</p>
+
+    <div class="scenes" role="list" aria-label="Storyboard scenes list">
+      <div tabindex="0" role="listitem" class="scene-card" data-video="https://www.youtube.com/embed/dQw4w9WgXcQ" aria-describedby="desc1" aria-label="Scene 1: Opening">
+        <div class="scene-image" style="background-image: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80');"></div>
+        <div class="scene-content">
+          <h2 id="title1" class="scene-title">Scene 1: Opening</h2>
+          <p id="desc1" class="scene-desc">Introduce characters and set the mood with atmospheric visuals and sound.</p>
+        </div>
+      </div>
+
+      <div tabindex="0" role="listitem" class="scene-card" data-video="https://www.youtube.com/embed/9bZkp7q19f0" aria-describedby="desc2" aria-label="Scene 2: Conflict">
+        <div class="scene-image" style="background-image: url('https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=400&q=80');"></div>
+        <div class="scene-content">
+          <h2 id="title2" class="scene-title">Scene 2: Conflict</h2>
+          <p id="desc2" class="scene-desc">Build tension and present challenges that propel the narrative forward.</p>
+        </div>
+      </div>
+
+      <div tabindex="0" role="listitem" class="scene-card" data-video="https://www.youtube.com/embed/3JZ_D3ELwOQ" aria-describedby="desc3" aria-label="Scene 3: Resolution">
+        <div class="scene-image" style="background-image: url('https://images.unsplash.com/photo-1462331940025-496dfbfc7564?auto=format&fit=crop&w=400&q=80');"></div>
+        <div class="scene-content">
+          <h2 id="title3" class="scene-title">Scene 3: Resolution</h2>
+          <p id="desc3" class="scene-desc">Conclude the story by resolving conflicts and highlighting key takeaways.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="timeline" aria-label="Scene navigation timeline" role="navigation">
+      <div class="timeline-progress"><div></div></div>
+      <button class="timeline-point" data-tooltip="Opening" aria-label="Go to scene 1" aria-pressed="true"></button>
+      <button class="timeline-point" data-tooltip="Conflict" aria-label="Go to scene 2" aria-pressed="false"></button>
+      <button class="timeline-point" data-tooltip="Resolution" aria-label="Go to scene 3" aria-pressed="false"></button>
+    </div>
+
+  </div>
+
+  <div class="video-modal" role="dialog" aria-modal="true" aria-label="Video player">
+    <div class="video-content">
+      <button class="btn-close" aria-label="Close video">&times;</button>
+      <iframe src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen title="Scene video"></iframe>
+    </div>
+  </div>
+
+  <div class="cursor"></div>
+
+<script>
+  (() => {
+    const scenes = document.querySelectorAll('.scene-card');
+    const timelinePoints = document.querySelectorAll('.timeline-point');
+    const timelineProgress = document.querySelector('.timeline-progress > div');
+    const videoModal = document.querySelector('.video-modal');
+    const videoIframe = videoModal.querySelector('iframe');
+    const closeBtn = videoModal.querySelector('.btn-close');
+    const cursor = document.querySelector('.cursor');
+    const darkModeToggle = document.querySelector('.toggle-darkmode');
+    const container = document.querySelector('.container');
+    let activeIndex = 0;
+
+    // Update timeline progress width based on activeIndex
+    function updateTimelineProgress(index) {
+      const maxWidthPercent = 100;
+      const pointsCount = timelinePoints.length;
+      const progressPercent = (index / (pointsCount - 1)) * maxWidthPercent;
+      timelineProgress.style.width = progressPercent + '%';
+    }
+
+    // Set active scene by index
+    function setActiveScene(index) {
+      if(index < 0 || index >= scenes.length) return;
+      activeIndex = index;
+
+      scenes.forEach((scene, i) => {
+        scene.classList.toggle('active', i === index);
+        scene.setAttribute('aria-selected', i === index);
+        timelinePoints[i].classList.toggle('active', i === index);
+        timelinePoints[i].setAttribute('aria-pressed', i === index);
+      });
+
+      updateTimelineProgress(index);
+    }
+
+    // Open video modal with the scene video
+    function openVideoModal(videoURL) {
+      videoIframe.src = videoURL + '?autoplay=1&rel=0';
+      videoModal.classList.add('active');
+      videoModal.focus();
+      document.body.style.overflow = 'hidden'; // disable scroll
+    }
+
+    // Close video modal
+    function closeVideoModal() {
+      videoModal.classList.remove('active');
+      videoIframe.src = '';
+      document.body.style.overflow = '';
+    }
+
+    // Scene click handler to open video modal
+    scenes.forEach((scene, i) => {
+      scene.addEventListener('click', () => {
+        openVideoModal(scene.dataset.video);
+      });
+      scene.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          openVideoModal(scene.dataset.video);
+        }
+      });
+    });
+
+    // Timeline points click handler
+    timelinePoints.forEach((point, i) => {
+      point.addEventListener('click', () => {
+        setActiveScene(i);
+        scenes[i].focus();
+      });
+    });
+
+    // Close video modal on close button or outside click
+    closeBtn.addEventListener('click', closeVideoModal);
+    videoModal.addEventListener('click', e => {
+      if(e.target === videoModal) closeVideoModal();
+    });
+
+    // Keyboard accessibility for video modal (Escape to close)
+    window.addEventListener('keydown', e => {
+      if(e.key === 'Escape' && videoModal.classList.contains('active')) {
+        closeVideoModal();
+      }
+    });
+
+    // Custom cursor movement
+    window.addEventListener('mousemove', e => {
+      cursor.style.left = e.clientX + 'px';
+      cursor.style.top = e.clientY + 'px';
+    });
+
+    // Cursor active state on interactive elements
+    const interactiveElements = [...document.querySelectorAll('button, .scene-card')];
+    interactiveElements.forEach(el => {
+      el.addEventListener('mouseenter', () => cursor.classList.add('active'));
+      el.addEventListener('mouseleave', () => cursor.classList.remove('active'));
+    });
+
+    // Dark mode toggle
+    darkModeToggle.addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+    });
+
+    // Initialize
+    setActiveScene(0);
+  })();
+</script>
+
+</body>
+</html>
